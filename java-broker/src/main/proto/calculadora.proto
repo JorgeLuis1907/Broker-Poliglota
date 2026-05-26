@@ -1,0 +1,42 @@
+// =====================================================================
+// CONTRATO gRPC - calculadora.proto
+// Define el lenguaje común entre todos los servicios del sistema
+// distribuido, sin importar en qué lenguaje estén programados.
+// =====================================================================
+syntax = "proto3";
+
+// Paquete Java: dónde se generarán las clases automáticamente
+option java_package = "calculadora.grpc";
+option java_outer_classname = "CalculadoraProto";
+option java_multiple_files = true;
+
+// Paquete Python (usado por grpc_tools.protoc)
+package calculadora;
+
+// ─────────────────────────────────────────────
+// MENSAJE DE PETICIÓN
+// El cliente envía estos tres campos al Broker.
+// ─────────────────────────────────────────────
+message SolicitudMath {
+  double numero1   = 1;  // Primer operando
+  double numero2   = 2;  // Segundo operando
+  string operacion = 3;  // "SUMA", "RESTA", "MULTIPLICACION", "DIVISION"
+}
+
+// ─────────────────────────────────────────────
+// MENSAJE DE RESPUESTA
+// El Broker (o microservicio) devuelve este mensaje.
+// ─────────────────────────────────────────────
+message RespuestaMath {
+  double resultado    = 1;  // Resultado numérico de la operación
+  bool   esExitoso   = 2;  // true = operación exitosa, false = hubo error
+  string mensajeError = 3;  // Vacío si fue exitoso, descriptivo si falló
+}
+
+// ─────────────────────────────────────────────
+// SERVICIO gRPC
+// Un solo método RPC que acepta la solicitud y devuelve la respuesta.
+// ─────────────────────────────────────────────
+service ServicioCalculadora {
+  rpc Calcular (SolicitudMath) returns (RespuestaMath);
+}
