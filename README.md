@@ -146,7 +146,7 @@ brew install openjdk maven python3
 cd java-broker
 
 # Limpia, genera stubs gRPC desde .proto, compila y empaqueta todo en un JAR
-mvn clean package -q
+mvn clean compile dependency:copy-dependencies
 
 # Resultado esperado:
 # target/grpc-calculadora.jar   ← Fat JAR con todas las dependencias
@@ -173,7 +173,7 @@ chmod +x instalar_python.sh
 
 O manualmente:
 ```bash
-pip3 install grpcio grpcio-tools
+pip3 install --break-system-packages grpcio grpcio-tools
 
 python3 -m grpc_tools.protoc \
   -I java-broker/src/main/proto \
@@ -195,7 +195,7 @@ Esto genera en `python-division/`:
 #### Terminal 1 — Microservicio SUMA (Java)
 ```bash
 cd java-broker
-java -cp target/grpc-calculadora.jar calculadora.ServidorSuma
+java -cp target/classes:target/dependency/* calculadora.ServidorSuma
 ```
 Salida esperada:
 ```
@@ -209,13 +209,13 @@ Salida esperada:
 #### Terminal 2 — Microservicio RESTA (Java)
 ```bash
 cd java-broker
-java -cp target/grpc-calculadora.jar calculadora.ServidorResta
+java -cp target/classes:target/dependency/* calculadora.ServidorResta
 ```
 
 #### Terminal 3 — Microservicio MULTIPLICACION (Java)
 ```bash
 cd java-broker
-java -cp target/grpc-calculadora.jar calculadora.ServidorMultiplica
+java -cp target/classes:target/dependency/* calculadora.ServidorMultiplica
 ```
 
 #### Terminal 4 — Microservicio DIVISION (Python)
@@ -235,7 +235,7 @@ Salida esperada:
 #### Terminal 5 — Broker Central (Java)
 ```bash
 cd java-broker
-java -cp target/grpc-calculadora.jar calculadora.BrokerServer
+java -Djava.awt.headless=true -cp target/classes:target/dependency/* calculadora.BrokerServer
 ```
 Salida esperada:
 ```
@@ -255,7 +255,7 @@ Salida esperada:
 #### Terminal 6 — Cliente Interactivo (Java)
 ```bash
 cd java-broker
-java -cp target/grpc-calculadora.jar calculadora.ClienteCalculadora
+java -cp target/classes:target/dependency/* calculadora.ClienteCalculadora
 ```
 
 ---
